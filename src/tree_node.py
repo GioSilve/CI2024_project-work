@@ -118,11 +118,11 @@ class TreeNode:
             right_val = self.right.evaluate_tree_from_node(variables_map, binary_operators_map, unary_operators_map) # Typically applies to right child
             
             res = unary_operators_map[self.value](right_val)
-            if np.any(np.isnan(res)):
-                print("invalid found")
-                print(right_val)
-                print(f"self: {self.value} - self right: {self.right.value} - self righ coeff: {self.right.coefficient} - self right right: {self.right.right.value}")      
-                self.print_tree_from_node(variables_map)          
+            # if np.any(np.isnan(res)):
+            #     print("invalid found")
+            #     print(right_val)
+            #     print(f"self: {self.value} - self right: {self.right.value} - self righ coeff: {self.right.coefficient} - self right right: {self.right.right.value}")      
+            #     self.print_tree_from_node(variables_map)          
                 
             return  res # Correct unary application
 
