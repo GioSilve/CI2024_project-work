@@ -31,3 +31,19 @@ class Tree:
 
     def draw_tree(self):
         self.root.draw_tree_from_node()
+
+    def update_depths_to_root(self, start_node):
+        """Update depths from start_node up to root"""
+        current = start_node
+        while current:
+            current.update_depth()
+            current = self.get_parent_from_root(current)
+    
+    def get_max_depth(self):
+        """Get the maximum depth of the tree"""
+        return self.root.depth if self.root else 0
+    
+
+    def get_parent_from_root(self,target):
+        """Get the parent of a node from the root"""
+        return self.root.get_parent(self.root, target)

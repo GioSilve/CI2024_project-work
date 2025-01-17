@@ -4,10 +4,11 @@ from visualize_tree import visualize_tree, display
 
 class TreeNode:
     def __init__(self, value):
-        self.value = value      # This can be an operator or operand
-        self.left = None        # Left child
-        self.right = None       # Right child
-        self.coefficient = None # multiplicative coefficient for a variable
+        self.value = value       # This can be an operator or operand
+        self.left = None         # Left child
+        self.right = None        # Right child
+        self.coefficient = None  # multiplicative coefficient for a variable
+        self.depth = 1           # Depth of the node
     
     def __copy__(self):
         return TreeNode(self.value, self.left, self.right, self.coefficient)
@@ -16,6 +17,20 @@ class TreeNode:
         if not isinstance(other, TreeNode):
             return False
         return self.value == other.value
+
+    def update_depth(self):
+        """Update the depth of this node based on its children"""
+        left_depth = self.left.depth if self.left else 0
+        right_depth = self.right.depth if self.right else 0
+        self.depth = max(left_depth, right_depth) + 1
+        
+    def update_depths_recursive(self):
+        """Update depths for this node and all ancestors"""
+        if self.left:
+            self.left.update_depths_recursive()
+        if self.right:
+            self.right.update_depths_recursive()
+        self._update_depth()
 
     def get_nodes_from_node(self):
         """ 
@@ -93,13 +108,24 @@ class TreeNode:
         if self.value in binary_operators_map:
             left_val = self.left.evaluate_tree_from_node(variables_map, binary_operators_map, unary_operators_map)
             right_val = self.right.evaluate_tree_from_node(variables_map, binary_operators_map, unary_operators_map)
-            return binary_operators_map[self.value](left_val, right_val)
-        
+                # self.draw_tree_from_node()
+            restult = binary_operators_map[self.value](left_val, right_val)
+            if np.any(np.isnan(restult)):
+                print("invalid found")
+            return restult
         # Check if it's a unary operator
         elif self.value in unary_operators_map:
             right_val = self.right.evaluate_tree_from_node(variables_map, binary_operators_map, unary_operators_map) # Typically applies to right child
-            return unary_operators_map[self.value](right_val)  # Correct unary application
-        
+            
+            res = unary_operators_map[self.value](right_val)
+            if np.any(np.isnan(res)):
+                print("invalid found")
+                print(right_val)
+                print(f"self: {self.value} - self right: {self.right.value} - self righ coeff: {self.right.coefficient} - self right right: {self.right.right.value}")      
+                self.print_tree_from_node(variables_map)          
+                
+            return  res # Correct unary application
+
         # Check if it's a variable
         elif self.value in variables_map:
             # return VARIABLES_MAP[self.value]  # Lookup the variable value
@@ -121,3 +147,17 @@ class TreeNode:
 
     def draw_tree_from_node(self):
         display(visualize_tree(self))
+
+    def get_parent(self, root, target):
+        """
+        Find the parent of a target node in the tree.
+        """
+        # The 'is' operator is unaffected by __eq__ and always checks if two variables refer to the same object in memory.
+        # https://chatgpt.com/share/678294b0-ed60-8004-932d-40c051582d22
+        if not root or root is target:
+            return None
+        if root.left is target or root.right is target:
+            return root
+        return self.get_parent(root.right, target) or self.get_parent(root.left, target)
+    
+
