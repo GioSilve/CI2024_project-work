@@ -96,7 +96,7 @@ class TreeNode:
         else:
             return False  # Invalid value
     
-    # (3 + 2) * (4 + 5)        Treenode (value = *, left = Treenode (value = +, left = 3, right = 2), right = Treenode (value = +, left = 4, right = 5))
+     # (3 + 2) * (4 + 5)        Treenode (value = *, left = Treenode (value = +, left = 3, right = 2), right = Treenode (value = +, left = 4, right = 5))
     def evaluate_tree_from_node(self, variables_map, binary_operators_map, unary_operators_map):
         """
         Returns the value of the expression represented by the tree starting form a specific node
