@@ -1,4 +1,5 @@
 import numpy as np
+import globals as gb
 from print_tree import *
 from visualize_tree import visualize_tree, display
 
@@ -71,25 +72,25 @@ class TreeNode:
             nodes.extend(self.right.get_leaves_nodes_from_node())
         return nodes
         
-    def validate_tree_from_node(self, variables, binary_operators, unary_operators):
+    def validate_tree_from_node(self):
         """
         Returns True if the tree is syntactically correct without checking domain constraints of operators, False otherwise
         """
         if not self:
             return True
         
-        if self.value in binary_operators:
+        if self.value in gb.BINARY_OPERATORS:
             if not self.left or not self.right:
                 return False  # Operators must have two children
-            return self.left.validate_tree_from_node(variables, binary_operators, unary_operators) and self.right.validate_tree_from_node(variables, binary_operators, unary_operators)
+            return self.left.validate_tree_from_node() and self.right.validate_tree_from_node()
         
-        elif self.value in unary_operators:  # Allow unary operators
+        elif self.value in gb.UNARY_OPERATORS:  # Allow unary operators
             if self.right and not self.left:
-                return self.right.validate_tree_from_node(variables, binary_operators, unary_operators)
+                return self.right.validate_tree_from_node()
             return False  # Unary operators must have one child on the right
         
         # elif self.value in VARIABLES_MAP and isinstance(self.value, str):  # Allow variables
-        elif self.value in variables: # or (self.value > -MAX_COEFFICIENT and self.value < MAX_COEFFICIENT):
+        elif self.value in gb.VARIABLES_MAP: # or (self.value > -MAX_COEFFICIENT and self.value < MAX_COEFFICIENT):
             return True
         elif isinstance(self.value, float):
             return True
@@ -97,7 +98,7 @@ class TreeNode:
             return False  # Invalid value
     
      # (3 + 2) * (4 + 5)        Treenode (value = *, left = Treenode (value = +, left = 3, right = 2), right = Treenode (value = +, left = 4, right = 5))
-    def evaluate_tree_from_node(self, variables_map, binary_operators_map, unary_operators_map):
+    def evaluate_tree_from_node(self):
         """
         Returns the value of the expression represented by the tree starting form a specific node
         """
@@ -105,19 +106,19 @@ class TreeNode:
             raise ValueError("Cannot evaluate an empty tree.")
         
         # Check if it's a binary operator
-        if self.value in binary_operators_map:
-            left_val = self.left.evaluate_tree_from_node(variables_map, binary_operators_map, unary_operators_map)
-            right_val = self.right.evaluate_tree_from_node(variables_map, binary_operators_map, unary_operators_map)
+        if self.value in gb.BINARY_OPERATORS:
+            left_val = self.left.evaluate_tree_from_node()
+            right_val = self.right.evaluate_tree_from_node()
                 # self.draw_tree_from_node()
-            restult = binary_operators_map[self.value](left_val, right_val)
+            restult = gb.BINARY_OPERATORS[self.value](left_val, right_val)
             if np.any(np.isnan(restult)):
                 print("invalid found")
             return restult
         # Check if it's a unary operator
-        elif self.value in unary_operators_map:
-            right_val = self.right.evaluate_tree_from_node(variables_map, binary_operators_map, unary_operators_map) # Typically applies to right child
+        elif self.value in gb.UNARY_OPERATORS:
+            right_val = self.right.evaluate_tree_from_node() # Typically applies to right child
             
-            res = unary_operators_map[self.value](right_val)
+            res = gb.UNARY_OPERATORS[self.value](right_val)
             # if np.any(np.isnan(res)):
             #     print("invalid found")
             #     print(right_val)
@@ -127,9 +128,9 @@ class TreeNode:
             return  res # Correct unary application
 
         # Check if it's a variable
-        elif self.value in variables_map:
+        elif self.value in gb.VARIABLES_MAP:
             # return VARIABLES_MAP[self.value]  # Lookup the variable value
-            return np.multiply(self.coefficient, variables_map[self.value])  # Lookup the variable value
+            return np.multiply(self.coefficient, gb.VARIABLES_MAP[self.value])  # Lookup the variable value
         
         # Check if it's a numeric constant or coefficient
         elif isinstance(self.value, (int, float)):
@@ -139,11 +140,11 @@ class TreeNode:
         else:
             raise ValueError(f"Invalid self value: {self.value}")
 
-    def print_tree_from_node(self, variables_map):
-        print_expr(self, variables_map)
+    def print_tree_from_node(self):
+        print_expr(self)
 
-    def print_tree_values_from_node(self, variables_map, binary_operators_map, unary_operators_map):
-        print_expr_values(self, variables_map, binary_operators_map, unary_operators_map)
+    def print_tree_values_from_node(self):
+        print_expr_values(self)
 
     def draw_tree_from_node(self):
         display(visualize_tree(self))
@@ -159,5 +160,3 @@ class TreeNode:
         if root.left is target or root.right is target:
             return root
         return self.get_parent(root.right, target) or self.get_parent(root.left, target)
-    
-
