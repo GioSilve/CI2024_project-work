@@ -94,7 +94,8 @@ def compute_coefficient(x_i, variables_map, ranges):
     x_array = list(variables_map.keys()) 
     index = x_array.index(x_i)
     sign = random.choice([-1, 1])
-    return np.random.uniform(ranges[index][0], ranges[index][1])*sign # TODO fix
+    return round(np.random.uniform(ranges[index][0], ranges[index][1])*sign, 2)
+    # return np.random.randint(ranges[index][0], ranges[index][1])*sign 
 
 
 
