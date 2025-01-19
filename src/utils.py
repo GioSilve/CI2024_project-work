@@ -82,7 +82,8 @@ def similarity(operator, x_i, y):
 
 def compute_weights_sim(operators):
     weights = {op: 0 for op in operators}
-    
+    # print(f"operators {operators}")
+    # print(f"weights {weights}")
     for op in weights:
         max_sim = 0
         for i in range(np.shape(gb.X)[0]):
@@ -98,8 +99,8 @@ def compute_weights_sim(operators):
         weights = {k: v/total for k, v in weights.items()}
     else:
         # If all correlations failed, use uniform weights
-        weights = {k: 1.0/len(gb.UNARY_OPERATORS) for k in gb.UNARY_OPERATORS.keys()}
-        
+        weights = {k: 1.0/len(operators) for k in operators.keys()}
+    # print(f"weights {weights}")
     return weights
 
 def sort_individuals(population, mse_weight=0.6):
