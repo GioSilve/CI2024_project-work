@@ -1,7 +1,6 @@
 import numpy as np
 import random
 
-
 """functions for generating multiplication coefficients for variables"""
 """------------------------------------------------------------------"""
 def optimize_initial_coefficients(x, y):
@@ -21,9 +20,7 @@ def optimize_initial_coefficients(x, y):
     coefficients : array of shape (n_features, )
         Scaling coefficients for each feature
     """
-    y_mean = np.mean(y)
     y_std = np.std(y)
-    y_min, y_max = np.min(y), np.max(y)
     
     # For each feature in x
     coefficients = []
@@ -119,9 +116,7 @@ def get_constant_ranges(y):
     """
     
     """"""
-    y_mean = np.mean(y)
     y_std = np.std(y)
-    y_min, y_max = np.min(y), np.max(y)
     
     # Create different ranges based on operation context
     ranges = {
@@ -188,7 +183,6 @@ def generate_safe_constant(y):
         A constant value that is safe to use with any operation
     """
     y_std = np.std(y)
-    y_mean = np.mean(y)
     
     # Start with a conservative range
     min_val = 0.1  # Avoid zero for division
