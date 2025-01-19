@@ -99,7 +99,7 @@ def compute_weights_sim(operators):
         weights = {k: v/total for k, v in weights.items()}
     else:
         # If all correlations failed, use uniform weights
-        weights = {k: 1.0/len(operators) for k in operators.keys()}
+        weights = {k: 1.0/len(operators) for k in operators}
     # print(f"weights {weights}")
     return weights
 
@@ -107,7 +107,8 @@ def sort_individuals(population, mse_weight=0.6):
     # Normalize both components to [0,1] scale across the population
     mse_scores = np.array([ind.fitness[0] for ind in population])
     sign_scores = np.array([ind.fitness[1] for ind in population])
-    
+    if not population:
+        print("ENSOMMA")
     # can't sort if all mse's are equal
     diff_max_min = (mse_scores.max() - mse_scores.min())
     if diff_max_min == 0 :

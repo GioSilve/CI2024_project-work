@@ -36,6 +36,11 @@ def point_mutation(target_tree: Tree):
                     # target_tree.print_tree(VARIABLES_MAP)
                     # print("ok")
                     return True
+                if node.value not in unary_operators:
+                    print(node.value)
+                    print(unary_operators)
+                    print(unary_weights)
+                    print(tmp)
                 unary_operators.remove(node.value)
                 unary_weights = {op: i for op,i in compute_weights_sim(unary_operators).items()}
                 node.value = tmp
