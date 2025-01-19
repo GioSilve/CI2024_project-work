@@ -26,7 +26,7 @@ UNARY_OPERATORS = {
         # "exp": np.exp
     }
 
-X, Y, PROBLEM_SIZE, VARIABLES_MAP, COEFFICIENT_RANGES, CONSTANT_RANGES, POPULATION_SIZE, OFFSPRING_SIZE, MAX_ITERATIONS = None, None, None, None, None, None, None, None, None
+X, Y, PROBLEM_SIZE, VARIABLES_MAP, COEFFICIENT_RANGES, CONSTANT_RANGES = None, None, None, None, None, None
 
 
     
@@ -46,9 +46,7 @@ def initialize_globals_for_problem(problem_id):
 
     COEFFICIENT_RANGES = get_coefficient_ranges(X,Y)
     CONSTANT_RANGES = get_constant_ranges(Y)
-    POPULATION_SIZE = PROBLEM_SIZE * 20
-    OFFSPRING_SIZE = int(POPULATION_SIZE / 4)
-    MAX_ITERATIONS = POPULATION_SIZE * 100
+
     # print(np.shape(x))
 
 
