@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import globals as gb
 
 """functions for generating multiplication coefficients for variables"""
 """------------------------------------------------------------------"""
@@ -62,8 +63,8 @@ def get_coefficient_ranges(x,y):
     ranges = []
     for coeff in base_coeffs:
         # Create range from 0.1× to 10× the optimized coefficient
-        min_coeff = coeff * 0.1
-        max_coeff = coeff * 10
+        min_coeff = coeff * 0.01
+        max_coeff = coeff * 5
         ranges.append((min_coeff, max_coeff))
         
     return ranges
@@ -91,8 +92,8 @@ def compute_coefficient(x_i, variables_map, ranges):
     x_array = list(variables_map.keys()) 
     index = x_array.index(x_i)
     sign = random.choice([-1, 1])
-    return round(np.random.uniform(ranges[index][0], ranges[index][1])*sign, 2)
-    # return np.random.randint(ranges[index][0], ranges[index][1])*sign 
+    # return round(np.random.uniform(ranges[index][0], ranges[index][1])*sign, 4)
+    return np.random.uniform(ranges[index][0], ranges[index][1])*sign 
 
 
 
@@ -117,11 +118,19 @@ def get_constant_ranges(y):
     
     """"""
     y_std = np.std(y)
+    y_mean = np.mean(np.abs(y))
+    x_mean = np.mean(np.abs(gb.X))
+    
+    # Calculate multiplication scaling factor based on input/output ratio
+    mult_scale = y_mean / x_mean if x_mean != 0 else y_mean
+    
+    # Adjust the range based on the scale difference
+    mult_range = max(2.0, mult_scale)
     
     # Create different ranges based on operation context
     ranges = {
         'add_sub': (-y_std, y_std),  # for addition/subtraction
-        'mult_div': (-2.0, 2.0),     # for multiplication/division
+        'mult_div': (-mult_range, mult_range),     # for multiplication/division
         'small': (-1.0, 1.0),        # for fine-tuning
         'powers': range(-3, 3)        # for exponents, usually small integers
     }
@@ -152,7 +161,7 @@ def generate_constant(operation_type, unary_operators, y):
     ranges = get_constant_ranges(y)
 
     
-    if random.random() < 0.5:
+    if random.random() < 0.25:
         operation_type = 'small'
     else:
         if operation_type == '+' or operation_type == '-':
@@ -187,5 +196,7 @@ def generate_safe_constant(y):
     # Start with a conservative range
     min_val = 0.1  # Avoid zero for division
     max_val = min(2.0, y_std)  # Keep it reasonable for both mult and add
-    
+    # print(min_val, max_val)
+    if min_val > max_val:
+        min_val, max_val = max_val, min_val
     return np.random.uniform(min_val, max_val)
