@@ -215,18 +215,53 @@ MUTATIONS = {
 MUTATIONS_WEIGHTS = {
     "subtree": 0.25 , #0.25
     "point": 0.3 , #0.3
-    "permutation": 0.1, #0.2 
+    "permutation": 0.1, #0.1
     "hoist": 0.1, #0.1
     "expansion": 0.15, #0.15
     "collapse": 0.1 #0.1
  }
 
+def scale_weights_by_depth(weights, depth):
+    if depth > 3 and depth < 6:
+        for m in weights.keys():
+            if m == "hoist" or m == "collapse":
+                weights[m] = 0.2
+            elif m == "expansion":
+                weights[m] = 0.1
+            elif m == "point":
+                weights[m] = 0.25
+            elif m == "permutation":
+                weights[m] = 0.1
+            elif m == "subtree":
+                weights[m] = 0.15
+                
+    elif depth >= 6 and depth <= 10 :
+        for m in weights.keys():
+            if m == "hoist" or m == "collapse":
+                weights[m] = 0.3
+            elif m == "expansion":
+                weights[m] = 0.05
+            elif m == "point":
+                weights[m] = 0.2
+            elif m == "permutation":
+                weights[m] = 0.1
+            elif m == "subtree":
+                weights[m] = 0.05
+    elif depth > 10:
+        for m in weights.keys():
+            if m == "hoist" or m == "collapse":
+                weights[m] = 0.5
+            else:
+                weights[m] = 0
+          
+    return list(weights.values())
 
 def mutation(genome: Tree):
     available_mutations = list(MUTATIONS.keys())
     available_mutations_weights = {m:p for m,p in MUTATIONS_WEIGHTS.items()}
 
-    w_mutations = list(available_mutations_weights.values())
+    w_mutations = scale_weights_by_depth(available_mutations_weights, genome.depth)
+
     while available_mutations:
         mutation = np.random.choice(available_mutations, p=w_mutations)
         # print(mutation)
