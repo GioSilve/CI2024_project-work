@@ -1,64 +1,98 @@
 import numpy as np
 import globals as gb
 
-def are_compatible(operator, value, base=0):
+MAX_EXP = 709
+
+def are_compatible(operator, right_val, left_val=0):
+    # print("are compatible")
+    # print(f"operator: {operator} - right val: {right_val} - left val: {left_val}")
     match operator:
+        case "+":
+            if not isinstance(right_val, np.ndarray) and not isinstance(left_val, np.ndarray):
+                return False if right_val == 0 and left_val == 0 else True
+            else: # check if all right_vals are non-zero
+                summation = np.add(right_val, left_val)
+                if np.all(summation == 0):
+                    return False
+                return True
+        case "-":
+            if not isinstance(right_val, np.ndarray) and not isinstance(left_val, np.ndarray):
+                return False if right_val == 0 and left_val == 0 else True
+            else: # check if all right_vals are non-zero
+                difference = np.subtract(right_val, left_val)
+                if np.all(difference == 0):
+                    return False
+                return True
+        case "*":
+            if not isinstance(right_val, np.ndarray) and not isinstance(left_val, np.ndarray):
+                return False if right_val == 0 or left_val == 0 else True               
+            else:
+                prod = np.multiply(right_val, left_val)
+                if np.all(prod == 0):
+                    return False
+                return True
         case "/":
-            if not isinstance(value,np.ndarray):
-                return False if value == 0 else True
-            else : # check if all values are non-zero
-                return False if (0 in value) else True
+            if not isinstance(right_val,np.ndarray):
+                return False if right_val == 0 else True
+            else : # check if all right_vals are non-zero
+                return False if (0 in right_val) else True
             
         case "^":
-            if not isinstance(value, np.ndarray) and not isinstance(base, np.ndarray): # (non array) ^ (non array)
-                return False if (base < 0 and not int(value) == value) or (base == 0 and value < 0) else True
-            elif not isinstance(value, np.ndarray) and isinstance(base, np.ndarray): # array ^ (non array)
-                return False if (not int(value) == value and np.any(base < 0)) or (value < 0 and np.any(base == 0)) else True
-            elif isinstance(value, np.ndarray) and not isinstance(base, np.ndarray): # (non array) ^ array
-                return False if (base < 0 and any((not int(i) == i) for i in value)) or (base == 0 and np.any(value < 0)) else True
+            if not isinstance(right_val, np.ndarray) and not isinstance(left_val, np.ndarray): # (non array) ^ (non array)
+                return False if ( left_val < 0 and not int(right_val) == right_val) or (left_val == 0 and right_val < 0) else True
+            elif not isinstance(right_val, np.ndarray) and isinstance(left_val, np.ndarray): # array ^ (non array)
+                return False if (not int(right_val) == right_val and np.any(left_val < 0)) or (right_val < 0 and np.any(left_val == 0)) else True
+            elif isinstance(right_val, np.ndarray) and not isinstance(left_val, np.ndarray): # (non array) ^ array
+                return False if (left_val < 0 and any((not int(i) == i) for i in right_val)) or (left_val == 0 and np.any(right_val < 0)) else True
             else : # array ^ array
-                for i in range(len(value)):                    
-                    if (base[i] < 0 and not int(value[i]) == value[i]) or (base[i] == 0 and value[i] < 0):
+                for i in range(len(right_val)):                    
+                    if (left_val[i] < 0 and not int(right_val[i]) == right_val[i]) or (left_val[i] == 0 and right_val[i] < 0):
                         return False 
                 return True
+        
+        case "exp":
+            if not isinstance(right_val,np.ndarray):
+                return False if right_val > MAX_EXP else True
+            else : # check if all right_vals are less than MAX_EXP
+                return False if (np.any(right_val > MAX_EXP)) else True
             
         case "log" :
-            if not isinstance(value,np.ndarray):
-                return False if value <= 0 else True
-            else : # check if all values are non-negative
-                return False if (np.any(value <= 0)) else True
+            if not isinstance(right_val,np.ndarray):
+                return False if right_val <= 0 else True
+            else : # check if all right_vals are non-negative
+                return False if (np.any(right_val <= 0)) else True
         
         case "arccos" :
-            if not isinstance(value,np.ndarray):
-                return False if value < -1 or value > 1 else True
-            else : # check if all values are between -1 and 1
-                return False if (np.any(value < -1 ) or np.any(value > 1) ) else True
+            if not isinstance(right_val,np.ndarray):
+                return False if right_val < -1 or right_val > 1 else True
+            else : # check if all right_vals are between -1 and 1
+                return False if (np.any(right_val < -1 ) or np.any(right_val > 1) ) else True
             
         case "arcsin" :
-            if not isinstance(value,np.ndarray):
-                return False if value < -1 or value > 1 else True
-            else : # check if all values are between -1 and 1
-                return False if (np.any(value < -1 )or np.any(value > 1) )else True
+            if not isinstance(right_val,np.ndarray):
+                return False if right_val < -1 or right_val > 1 else True
+            else : # check if all right_vals are between -1 and 1
+                return False if (np.any(right_val < -1 )or np.any(right_val > 1) )else True
         
         case "sqrt" :
-            if not isinstance(value,np.ndarray):
-                return False if value < 0 else True
-            else : # check if all values are non-negative
-                return False if (np.any(value < 0) )else True
+            if not isinstance(right_val,np.ndarray):
+                return False if right_val < 0 else True
+            else : # check if all right_vals are non-negative
+                return False if (np.any(right_val < 0) )else True
 
         case "reciprocal" :
-            if not isinstance(value,np.ndarray):
-                return False if value == 0 else True
+            if not isinstance(right_val,np.ndarray):
+                return False if right_val == 0 else True
             else:
-                return False if (np.any(value == 0)) else True
+                return False if (np.any(right_val == 0)) else True
             
         case "tan" :
-            if not isinstance(value,np.ndarray):
-                k = (value - np.pi / 2) / np.pi
+            if not isinstance(right_val,np.ndarray):
+                k = (right_val - np.pi / 2) / np.pi
                 return False if k.is_integer() else True
             else:
-                for i in range(len(value)):
-                    k = (value[i] - np.pi / 2) / np.pi
+                for i in range(len(right_val)):
+                    k = (right_val[i] - np.pi / 2) / np.pi
                     if k.is_integer():
                         return False
                 return True
@@ -124,7 +158,7 @@ def sort_individuals(population, mse_weight=0.6):
     #                                         key=lambda pair: pair[0], 
     #                                         reverse=True)]
 
-    # Sort population based on combined scores (descending order)
+    # Sort population left_vald on combined scores (descending order)
     sorted_pairs = sorted(zip(combined_scores, population), key=lambda pair: pair[0], reverse=True)
     sorted_scores, sorted_population = zip(*sorted_pairs)
     
