@@ -164,7 +164,7 @@ def sort_individuals(population, mse_weight=0.6):
     
     return list(sorted_population), list(sorted_scores)
 
-def compute_score(individual, population, mse_weight=0.6):
+def compute_score(individual, population, mse_weight=0.76):
      # Normalize both components to [0,1] scale across the population
     mse_scores = np.array([ind.fitness[0] for ind in population])
     sign_scores = np.array([ind.fitness[1] for ind in population])
@@ -175,3 +175,16 @@ def compute_score(individual, population, mse_weight=0.6):
     
     # Combine scores with weighted sum
     return mse_weight * mse_norm + (1 - mse_weight) * sign_norm
+
+def get_unary_weights(avaialble_operators):
+    
+    available_weights = [w for op, w in gb.UNARY_WEIGHTS.items() if op in avaialble_operators]
+
+    # normalize weights
+    total = sum(available_weights)
+    if total > 0:
+        available_weights = [w/total for w in available_weights]
+    else:
+        # If all correlations failed, use uniform weights
+        available_weights = [1.0/len(avaialble_operators) for _ in avaialble_operators]
+    return available_weights
