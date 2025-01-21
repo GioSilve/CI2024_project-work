@@ -4,7 +4,7 @@ import copy
 import globals as gb
 from tree import Tree, try_swap, validate_after_replacement, get_random_leaf, generate_initial_solution
 from generators import compute_coefficient, generate_constant
-from utils import are_compatible, compute_weights_sim
+from utils import are_compatible, get_unary_weights
 
 def subtree_mutation(target_tree: Tree):
     # generate a random source tree to substitute into target_tree
@@ -23,26 +23,21 @@ def point_mutation(target_tree: Tree):
     while nodes:
         node = random.choice(nodes)
         unary_operators = [op for op in  list(gb.UNARY_OPERATORS.keys()) if op != node.value]
-        unary_weights = {op: i for op,i in compute_weights_sim(unary_operators).items()}
+        # unary_weights = {op: i for op,i in compute_weights_sim(unary_operators).items()}
+        unary_weights = get_unary_weights(unary_operators)
         binary_operators = [op for op in list(gb.BINARY_OPERATORS.keys()) if op != node.value]
         # mutate unary operator with another one
         if (node.value in gb.UNARY_OPERATORS):
             while unary_operators:
                 tmp = node.value
                 # print(f"substituing : {tmp}")
-                node.value = np.random.choice(list(unary_weights.keys()), p=list(unary_weights.values()))
+                node.value = np.random.choice(unary_operators, p=unary_weights)
                 # print(f"chosen {node.value}")
                 if are_compatible(node.value, node.right.evaluate_tree_from_node()) and validate_after_replacement(target_tree.root, node):
-                    # target_tree.print_tree(VARIABLES_MAP)
-                    # print("ok")
                     return True
-                if node.value not in unary_operators:
-                    print(node.value)
-                    print(unary_operators)
-                    print(unary_weights)
-                    print(tmp)
+                
                 unary_operators.remove(node.value)
-                unary_weights = {op: i for op,i in compute_weights_sim(unary_operators).items()}
+                unary_weights = get_unary_weights(unary_operators)
                 node.value = tmp
 
         # mutate binary operator with another one
@@ -222,7 +217,11 @@ MUTATIONS_WEIGHTS = {
  }
 
 def scale_weights_by_depth(weights, depth):
-    if depth > 3 and depth < 6:
+    n_expected_leaves = int(2 ** np.ceil(np.log2(gb.PROBLEM_SIZE)))
+    expected_depth = np.log2(n_expected_leaves * 2) + 1
+
+
+    if depth > expected_depth and depth < expected_depth + 2 :
         for m in weights.keys():
             if m == "hoist" or m == "collapse":
                 weights[m] = 0.2
@@ -235,7 +234,7 @@ def scale_weights_by_depth(weights, depth):
             elif m == "subtree":
                 weights[m] = 0.15
                 
-    elif depth >= 6 and depth <= 10 :
+    elif depth >= expected_depth + 2 and depth <= expected_depth + 4 :
         for m in weights.keys():
             if m == "hoist" or m == "collapse":
                 weights[m] = 0.3
