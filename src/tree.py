@@ -2,7 +2,7 @@ import numpy as np
 import random
 import globals as gb
 from generators import compute_coefficient, generate_safe_constant
-from utils import are_compatible, compute_weights_sim
+from utils import are_compatible, get_unary_weights
 from tree_node import TreeNode
 
 class Tree:
@@ -73,7 +73,8 @@ def random_initial_tree(depth, maxdepth, variables):
         node.left = None
     
         available_unary = [op for op in gb.UNARY_OPERATORS if are_compatible(op, np.multiply(gb.VARIABLES_MAP[node.right.value], node.right.coefficient) if node.right.value in gb.VARIABLES_MAP else node.right.value)]
-        available_weights = list(compute_weights_sim(available_unary).values())
+        # available_weights = list(compute_weights_sim(available_unary).values())
+        available_weights = get_unary_weights(available_unary)
         node.value = np.random.choice(available_unary, p=available_weights) # If a choice of a variant unary operator was made, choose a random variant from all the possible ones
         node.update_depth()
         return node
@@ -206,6 +207,7 @@ def generate_initial_solution(input_variables=None, seed=None):
     if n_variables != 0:
         n_leaves = int(2 ** np.ceil(np.log2(n_variables)))
         n_actual_leaves = n_leaves * random.choice([2, 4])
+        # n_actual_leaves = n_leaves * 2
         max_depth = np.log2(n_actual_leaves)
     else:
         raise KeyError("Not enough variables in general_initial_solution")
