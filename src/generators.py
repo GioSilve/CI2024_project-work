@@ -5,7 +5,6 @@ import globals as gb
 """functions for generating multiplication coefficients for variables"""
 """------------------------------------------------------------------"""
 def optimize_initial_coefficients(x, y):
-    # Get statistics from y
     """
     Compute basic scaling coefficients to match the range of y for each feature in x.
     
@@ -40,7 +39,6 @@ def optimize_initial_coefficients(x, y):
 
 
 def get_coefficient_ranges(x,y):
-    # Get rough scaling factors
     """
     Compute a range of possible coefficients for each feature in x to approximate the range of y.
     
@@ -70,7 +68,6 @@ def get_coefficient_ranges(x,y):
     return ranges
 
 def compute_coefficient(x_i, variables_map, ranges):
- 
     """
     Compute a random coefficient for feature x_i in the given range.
     
@@ -92,7 +89,6 @@ def compute_coefficient(x_i, variables_map, ranges):
     x_array = list(variables_map.keys()) 
     index = x_array.index(x_i)
     sign = random.choice([-1, 1])
-    # return round(np.random.uniform(ranges[index][0], ranges[index][1])*sign, 4)
     return np.random.uniform(ranges[index][0], ranges[index][1])*sign 
 
 
@@ -156,11 +152,8 @@ def generate_constant(operation_type, unary_operators, y):
         A constant value based on the given operation type and output values
     """
     if operation_type in unary_operators.keys():
-        return generate_safe_constant(y) # TODO generate constant generator for unary oeprators
-    
-    ranges = get_constant_ranges(y)
-
-    
+        return generate_safe_constant(y)    
+    ranges = get_constant_ranges(y)    
     if random.random() < 0.25:
         operation_type = 'small'
     else:
@@ -168,8 +161,7 @@ def generate_constant(operation_type, unary_operators, y):
             operation_type = 'add_sub'
         elif operation_type == '*' or operation_type == '/':
             operation_type = 'mult_div'
-        
-        else:      # Integer constants for exponents
+        else:  # Integer constants for exponents
             return np.random.choice(ranges['powers'])
         
     min_val, max_val = ranges[operation_type]
@@ -196,7 +188,6 @@ def generate_safe_constant(y):
     # Start with a conservative range
     min_val = 0.1  # Avoid zero for division
     max_val = min(2.0, y_std)  # Keep it reasonable for both mult and add
-    # print(min_val, max_val)
     if min_val > max_val:
         min_val, max_val = max_val, min_val
     return np.random.uniform(min_val, max_val)

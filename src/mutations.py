@@ -16,23 +16,20 @@ def subtree_mutation(target_tree: Tree):
 
     return try_swap(source_tree_root, target_tree, True)
 
+
 def point_mutation(target_tree: Tree):
     nodes = target_tree.get_nodes()
-    # target_tree.print_tree(VARIABLES_MAP)
 
     while nodes:
         node = random.choice(nodes)
         unary_operators = [op for op in  list(gb.UNARY_OPERATORS.keys()) if op != node.value]
-        # unary_weights = {op: i for op,i in compute_weights_sim(unary_operators).items()}
         unary_weights = get_unary_weights(unary_operators)
         binary_operators = [op for op in list(gb.BINARY_OPERATORS.keys()) if op != node.value]
         # mutate unary operator with another one
         if (node.value in gb.UNARY_OPERATORS):
             while unary_operators:
                 tmp = node.value
-                # print(f"substituing : {tmp}")
                 node.value = np.random.choice(unary_operators, p=unary_weights)
-                # print(f"chosen {node.value}")
                 if are_compatible(node.value, node.right.evaluate_tree_from_node()) and validate_after_replacement(target_tree.root, node):
                     return True
                 
@@ -68,7 +65,6 @@ def point_mutation(target_tree: Tree):
         else :
             # change the constant
             tmp = node.value
-            # node.value = compute_coefficient() # TODO change to compute constant
             parent = target_tree.get_parent_from_root(node)
             node.value = generate_constant(parent.value, gb.UNARY_OPERATORS, gb.Y)
             if (parent.value in unary_operators and are_compatible(parent.value, parent.right.evaluate_tree_from_node()) and validate_after_replacement(target_tree.root, parent)) \
@@ -79,6 +75,7 @@ def point_mutation(target_tree: Tree):
         nodes.remove(node)
     return False
     
+
 def permutation_mutation(target_tree: Tree):
     available_nodes = [node for node in target_tree.get_non_leaves_nodes() if node.value in gb.BINARY_OPERATORS]
     
@@ -94,6 +91,7 @@ def permutation_mutation(target_tree: Tree):
         target_node.left = tmpl
         available_nodes.remove(target_node)
     return False
+
 
 def expansion_mutation(target_tree: Tree):
     leaves = target_tree.get_leaves_nodes()
@@ -134,8 +132,9 @@ def expansion_mutation(target_tree: Tree):
         leaves.remove(target_node)
     return False
 
-# substtitue the root with a subtree
+
 def hoist_mutation(target_tree: Tree):
+    # substitute the root with a subtree
     nodes = target_tree.get_non_leaves_nodes()
     root = target_tree.root
 
@@ -149,6 +148,7 @@ def hoist_mutation(target_tree: Tree):
 
     target_tree.root = node
     return True
+
 
 def collapse_mutation(target_tree: Tree):
     available_nodes = target_tree.get_non_leaves_nodes()
@@ -216,11 +216,10 @@ MUTATIONS_WEIGHTS = {
     "collapse": 0.1 #0.1
  }
 
+
 def scale_weights_by_depth(weights, depth):
     n_expected_leaves = int(2 ** np.ceil(np.log2(gb.PROBLEM_SIZE)))
     expected_depth = np.log2(n_expected_leaves * 2) + 1
-
-
     if depth > expected_depth and depth < expected_depth + 2 :
         for m in weights.keys():
             if m == "hoist" or m == "collapse":
@@ -255,7 +254,26 @@ def scale_weights_by_depth(weights, depth):
           
     return list(weights.values())
 
+
 def mutation(genome: Tree):
+    """
+    Perform a mutation on the given tree genome based on available mutation types.
+    
+    This function selects a mutation type from the defined MUTATIONS based on 
+    their scaled weights relative to the depth of the tree. It tries to apply
+    the selected mutation to the genome. If successful, it returns True. If 
+    not, it removes that mutation type from the list and rescales the weights, 
+    continuing the process until all mutation types are exhausted. If no mutation 
+    is successful, it returns False.
+
+    Parameters:
+    genome (Tree): The tree structure representing an individual solution that 
+                   is subject to mutation.
+
+    Returns:
+    bool: True if a mutation was successfully applied; False otherwise.
+    """
+
     available_mutations = list(MUTATIONS.keys())
     available_mutations_weights = {m:p for m,p in MUTATIONS_WEIGHTS.items()}
 

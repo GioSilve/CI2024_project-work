@@ -89,15 +89,14 @@ class TreeNode:
                 return self.right.validate_tree_from_node()
             return False  # Unary operators must have one child on the right
         
-        # elif self.value in VARIABLES_MAP and isinstance(self.value, str):  # Allow variables
-        elif self.value in gb.VARIABLES_MAP: # or (self.value > -MAX_COEFFICIENT and self.value < MAX_COEFFICIENT):
+        # Allow variables
+        elif self.value in gb.VARIABLES_MAP:
             return True
         elif isinstance(self.value, float):
             return True
         else:
             return False  # Invalid value
     
-     # (3 + 2) * (4 + 5)        Treenode (value = *, left = Treenode (value = +, left = 3, right = 2), right = Treenode (value = +, left = 4, right = 5))
     def evaluate_tree_from_node(self):
         """
         Returns the value of the expression represented by the tree starting form a specific node
@@ -117,19 +116,11 @@ class TreeNode:
         # Check if it's a unary operator
         elif self.value in gb.UNARY_OPERATORS:
             right_val = self.right.evaluate_tree_from_node() # Typically applies to right child
-            
-            res = gb.UNARY_OPERATORS[self.value](right_val)
-            # if np.any(np.isnan(res)):
-            #     print("invalid found")
-            #     print(right_val)
-            #     print(f"self: {self.value} - self right: {self.right.value} - self righ coeff: {self.right.coefficient} - self right right: {self.right.right.value}")      
-            #     self.print_tree_from_node(variables_map)          
-                
+            res = gb.UNARY_OPERATORS[self.value](right_val)                
             return  res # Correct unary application
 
         # Check if it's a variable
         elif self.value in gb.VARIABLES_MAP:
-            # return VARIABLES_MAP[self.value]  # Lookup the variable value
             return np.multiply(self.coefficient, gb.VARIABLES_MAP[self.value])  # Lookup the variable value
         
         # Check if it's a numeric constant or coefficient
@@ -154,7 +145,6 @@ class TreeNode:
         Find the parent of a target node in the tree.
         """
         # The 'is' operator is unaffected by __eq__ and always checks if two variables refer to the same object in memory.
-        # https://chatgpt.com/share/678294b0-ed60-8004-932d-40c051582d22
         if not root or root is target:
             return None
         if root.left is target or root.right is target:

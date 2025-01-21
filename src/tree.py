@@ -52,8 +52,25 @@ class Tree:
     def get_parent_from_root(self,target):
         """Get the parent of a node from the root"""
         return self.root.get_parent(self.root, target)
-    
+
+
 def random_initial_tree(depth, maxdepth, variables):
+    """
+    Recursively generates a random tree structure with specified depth constraints.
+
+    The function constructs a tree by randomly adding variables, unary operators, or binary operators
+    based on the current depth relative to the maximum depth allowed. At the maximum depth, variables 
+    or constants are added as leaf nodes. At one level before the maximum depth, unary operators are 
+    added. At other levels, binary operators are added.
+
+    Args:
+        depth (int): The current depth of the tree being constructed.
+        maxdepth (int): The maximum depth allowed for the tree.
+        variables (list): A list of variables available to be used as leaf nodes.
+
+    Returns:
+        TreeNode: The root node of the generated tree or subtree.
+    """
     if depth == maxdepth:  # Add a variable until they are all chosen, if yes add a number
         if variables:
             var = random.choice(variables)
@@ -61,7 +78,6 @@ def random_initial_tree(depth, maxdepth, variables):
             leaf.coefficient = compute_coefficient(var, gb.VARIABLES_MAP, gb.COEFFICIENT_RANGES)
             variables.remove(var)
         else:
-            # leaf = TreeNode(generators.compute_coefficient())  # TODO change to compute constant
             leaf = TreeNode(generate_safe_constant(gb.Y))
             leaf.coefficient = 1
         leaf.depth = 1
@@ -73,7 +89,6 @@ def random_initial_tree(depth, maxdepth, variables):
         node.left = None
     
         available_unary = [op for op in gb.UNARY_OPERATORS if are_compatible(op, np.multiply(gb.VARIABLES_MAP[node.right.value], node.right.coefficient) if node.right.value in gb.VARIABLES_MAP else node.right.value)]
-        # available_weights = list(compute_weights_sim(available_unary).values())
         available_weights = get_unary_weights(available_unary)
         node.value = np.random.choice(available_unary, p=available_weights) # If a choice of a variant unary operator was made, choose a random variant from all the possible ones
         node.update_depth()
@@ -88,18 +103,27 @@ def random_initial_tree(depth, maxdepth, variables):
         node.update_depth()
         return node
     
+
 def get_random_leaf():
-    if random.choice([0, 1]): # TODO could choose larger subtree
+    """
+    Returns a random leaf node that is either a variable or a constant.
+
+    The leaf node is chosen with equal probability to be either a variable or a constant.
+    If a variable is chosen, the coefficient is computed using the compute_coefficient function.
+    If a constant is chosen, it is generated using the generate_safe_constant function.
+
+    Returns:
+        TreeNode: The randomly generated leaf node.
+    """
+    if random.choice([0, 1]):
         random_leaf = TreeNode(random.choice(list(gb.VARIABLES_MAP.keys())))
         random_leaf.coefficient = compute_coefficient(random_leaf.value, gb.VARIABLES_MAP, gb.COEFFICIENT_RANGES)
     else:
         random_leaf = TreeNode(generate_safe_constant(gb.Y))
         random_leaf.coefficient = 1
-        # random_leaf.depth = 1
     return random_leaf
     
 
-# def validate_after_replacement(root:TreeNode, replaced_node: Tree, gb.unary_operators: list, gb.binary_operators:list):
 def validate_after_replacement(root:TreeNode, replaced_node: Tree):
     """
     Validate the tree after replacing a subtree.
@@ -136,6 +160,7 @@ def validate_after_replacement(root:TreeNode, replaced_node: Tree):
 
     return True
     
+
 def swap_subtrees(source_tree, target_tree):
     """
     Try to swap subtrees from source_tree to target_tree.
@@ -147,9 +172,6 @@ def swap_subtrees(source_tree, target_tree):
     Returns:
         bool: True if a swap was successful, False otherwise.
     """
-
-
-    # nodoA = random.choice(lista di nodi di A)
     source_nodes = source_tree.get_nodes()
 
     while source_nodes:
@@ -159,7 +181,24 @@ def swap_subtrees(source_tree, target_tree):
         source_nodes.remove(source_node)
     return False
 
+
 def try_swap(source_node: TreeNode, target_tree: Tree, filter_leaves_parents=False):
+    """
+    Attempt to swap a subtree from the source node into the target tree.
+
+    This function tries to replace a node in the target tree with the source node,
+    ensuring that the resulting tree remains valid by using compatibility checks and
+    validation after replacement.
+
+    Args:
+        source_node (TreeNode): The root node of the subtree to be swapped into the target tree.
+        target_tree (Tree): The tree where the source_node will be potentially inserted.
+        filter_leaves_parents (bool, optional): If set to True, only consider target nodes whose
+            children are not leaves to avoid making a leaf a parent. Defaults to False.
+
+    Returns:
+        bool: True if the swap was successful and the tree remains valid, False otherwise.
+    """
     target_nodes = target_tree.get_non_leaves_nodes()
     if filter_leaves_parents:
         # Consider only nodes whose children are not leaves to avoid adding subtree to leaf in mutation
@@ -196,18 +235,27 @@ def try_swap(source_node: TreeNode, target_tree: Tree, filter_leaves_parents=Fal
         target_nodes.remove(target_node)
     return False
 
-def generate_initial_solution(input_variables=None, seed=None):
+
+def generate_initial_solution(input_variables=None):
+    """
+    Generate an initial solution for the GP algorithm.
+
+    Args:
+        input_variables (list, optional): List of variables to be used in the tree. Defaults to all available variables.
+
+    Returns:
+        Tree: The initial solution tree.
+
+    Raises:
+        KeyError: If not enough variables are provided.
+    """    
     if input_variables is None:
         input_variables = list(gb.VARIABLES_MAP.keys())
-    if seed:
-        random.seed(seed)
-        np.random.seed(seed)
     variables = input_variables[:]
     n_variables = len(variables)
     if n_variables != 0:
         n_leaves = int(2 ** np.ceil(np.log2(n_variables)))
         n_actual_leaves = n_leaves * random.choice([2, 4])
-        # n_actual_leaves = n_leaves * 2
         max_depth = np.log2(n_actual_leaves)
     else:
         raise KeyError("Not enough variables in general_initial_solution")
@@ -215,7 +263,6 @@ def generate_initial_solution(input_variables=None, seed=None):
     while True:
         root = random_initial_tree(0, max_depth, variables)
         try:
-            #root.print_tree_from_node()
             if root.validate_tree_from_node():
                 root.evaluate_tree_from_node()
                 tree = Tree(root, max_depth)

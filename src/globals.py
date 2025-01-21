@@ -23,16 +23,11 @@ UNARY_OPERATORS = {
         "sqrt":np.sqrt,
         "cbrt":np.cbrt,
         "abs":np.abs,
-        "reciprocal":np.reciprocal,
-
+        "reciprocal":np.reciprocal
         # "exp": np.exp
     }
 
 X, Y, PROBLEM_SIZE, VARIABLES_MAP, COEFFICIENT_RANGES, CONSTANT_RANGES, UNARY_WEIGHTS = None, None, None, None, None, None, None
-
-
-    
-#LEAVES = [i for i in range(-MAX_COEFFICIENT, MAX_COEFFICIENT)] + list(VARIABLES_MAP.keys())
 
 
 def initialize_globals_for_problem(problem_id):
@@ -44,21 +39,6 @@ def initialize_globals_for_problem(problem_id):
 
     PROBLEM_SIZE  = np.shape(X)[0]
     VARIABLES_MAP = {f"X_{i}": X[i] for i in range(PROBLEM_SIZE)} # {'X_0': [1, 2, 3], 'X_1': [4, 5, 6], 'X_2': [7, 8, 9]}
-    # print(PROBLEM_SIZE)
-
     COEFFICIENT_RANGES = get_coefficient_ranges(X,Y)
     CONSTANT_RANGES = get_constant_ranges(Y)
     UNARY_WEIGHTS = compute_weights_sim(list(UNARY_OPERATORS.keys()))
-
-    # print(np.shape(x))
-
-
-
-# if __name__ == "__main__":
-#     x = read_problem(1)[0]
-#     y = read_problem(1)[1]
-#     size = read_problem(1)[2]
-#     print(x)
-#     print(y)
-#     print(size)
-
