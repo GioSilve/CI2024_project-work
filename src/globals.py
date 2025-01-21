@@ -1,5 +1,6 @@
 import numpy as np
 from generators import get_coefficient_ranges, get_constant_ranges
+from utils import compute_weights_sim
 
 BINARY_OPERATORS = {
     "+": np.add,
@@ -23,10 +24,11 @@ UNARY_OPERATORS = {
         "cbrt":np.cbrt,
         "abs":np.abs,
         "reciprocal":np.reciprocal,
+
         # "exp": np.exp
     }
 
-X, Y, PROBLEM_SIZE, VARIABLES_MAP, COEFFICIENT_RANGES, CONSTANT_RANGES = None, None, None, None, None, None
+X, Y, PROBLEM_SIZE, VARIABLES_MAP, COEFFICIENT_RANGES, CONSTANT_RANGES, UNARY_WEIGHTS = None, None, None, None, None, None, None
 
 
     
@@ -34,7 +36,7 @@ X, Y, PROBLEM_SIZE, VARIABLES_MAP, COEFFICIENT_RANGES, CONSTANT_RANGES = None, N
 
 
 def initialize_globals_for_problem(problem_id):
-    global X, Y, PROBLEM_SIZE, VARIABLES_MAP, COEFFICIENT_RANGES, CONSTANT_RANGES, POPULATION_SIZE, OFFSPRING_SIZE, MAX_ITERATIONS
+    global X, Y, PROBLEM_SIZE, VARIABLES_MAP, COEFFICIENT_RANGES, CONSTANT_RANGES, UNARY_WEIGHTS
     problem = np.load(f"../data/problem_{problem_id}.npz")
 
     X = problem['x']
@@ -46,6 +48,7 @@ def initialize_globals_for_problem(problem_id):
 
     COEFFICIENT_RANGES = get_coefficient_ranges(X,Y)
     CONSTANT_RANGES = get_constant_ranges(Y)
+    UNARY_WEIGHTS = compute_weights_sim(list(UNARY_OPERATORS.keys()))
 
     # print(np.shape(x))
 
