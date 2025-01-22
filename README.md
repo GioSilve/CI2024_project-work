@@ -1,8 +1,8 @@
 # CI2024_project-work
-Repo for final project work of Computational Intelligence 2024-2025 course at Politecnico di Torino.
+Repository for the final project of the Computational Intelligence 2024-2025 course at Politecnico di Torino.
 
 ## Notes on project realization
-This project was done in collaboration with [Giorgio Silvestre S331578](https://github.com/GioSilve)
+This project was done in collaboration with [Michele Perseo S331553](https://github.com/mickp18/)
 
 Some ideas were shared with and taken from [Lorenzo Cuccu S330260](https://github.com/Lorkenzo)
 
