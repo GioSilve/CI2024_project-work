@@ -36,7 +36,7 @@ The next step was to add an evolutionary algorithm that through recombinations a
 
 We divided our program in the following way, in order to achieve better modularity and clearer organization of the code.
 - [/data](./data): data given to us in the form of input values `X` and output values `Y`
-- [/s331553.py](s331553.py): contains the resulting function found by the algorithm for each problem given in the form 
+- [/s331578.py](s331578.py): contains the resulting function found by the algorithm for each problem given in the form 
     ```python
     def fX(x: np.ndarray) -> np.ndarray: 
         # mathematical expression represented using numpy operations, e.g.:
