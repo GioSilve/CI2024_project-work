@@ -133,7 +133,6 @@ def get_constant_ranges(y):
     return ranges
 
 def generate_constant(operation_type, unary_operators, y):
-    
     """
     Generate a constant value based on the given operation type and output values.
     
@@ -169,7 +168,6 @@ def generate_constant(operation_type, unary_operators, y):
     return np.random.uniform(min_val, max_val)
 
 def generate_safe_constant(y):
-   
     """
     Generate a constant value that is safe to use with any operation (i.e. not too large, not zero).
     
